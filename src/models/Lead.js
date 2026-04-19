@@ -4,33 +4,34 @@ const leadSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      required: true,
+      required: [true, 'First name is required'],
       trim: true,
     },
     lastName: {
       type: String,
-      required: true,
+      required: [true, 'Last name is required'],
       trim: true,
     },
     phone: {
       type: String,
-      required: true,
+      required: [true, 'Phone is required'],
       trim: true,
+      unique: true,
     },
     email: {
       type: String,
       trim: true,
       lowercase: true,
-      unique: true,
+      default: null,
     },
     courseInterest: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Course',
-      default: null
+      default: null,
     },
     source: {
       type: String,
-      enum: ['Website', 'Phone', 'Facebook', 'Instagram', 'Refarral', 'Walk-in'],
+      enum: ['Website', 'Phone', 'Facebook', 'Instagram', 'Referral', 'Walk-in'],
       default: 'Website',
     },
     status: {
@@ -43,15 +44,14 @@ const leadSchema = new mongoose.Schema(
       ref: 'User',
       default: null,
     },
-    utmSource:{
+    utmSource: {
       type: String,
       trim: true,
-      deafult:null,
+      default: null,
     },
   },
   {
     timestamps: true,
-    versionKey: false,
   }
 );
 
