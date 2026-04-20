@@ -4,6 +4,7 @@ import cors from 'cors';
 import connectDB from './config/db.js';
 import leadRoutes from './routes/leadRoutes.js';
 import { errorHandler } from './middlewares/errorMiddleware.js';
+import notFound from './middlewares/notFoundMiddleware.js';
 
 // Load env vars
 dotenv.config();
@@ -14,8 +15,12 @@ connectDB();
 const app = express();
 
 // Middleware
+
 app.use(cors());
 app.use(express.json());
+app.use(notFound);
+app.use(errorHandler);
+
 
 // Routes
 app.use('/api/leads', leadRoutes);

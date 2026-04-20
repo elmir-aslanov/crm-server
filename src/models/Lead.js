@@ -52,6 +52,8 @@ const leadSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+  },{
+    versionKey: false,
   }
 );
 
