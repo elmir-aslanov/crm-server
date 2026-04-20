@@ -20,7 +20,10 @@ const leadNoteSchema = new mongoose.Schema(
     },
     {
         timestamp: true,
-    }
+    },
+    {
+        versionKey: false,
+     }
 );
 
 const LeadNote = mongoose.model('LeadNote', leadNoteSchema);
