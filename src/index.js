@@ -18,15 +18,13 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use('/api/leads', leadRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
 
-// Routes
-app.use('/api/leads', leadRoutes);
 
-// Error handling middleware
-app.use(errorHandler);
+
 
 const PORT = process.env.PORT || 5000;
 
