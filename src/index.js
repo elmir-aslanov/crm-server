@@ -6,7 +6,7 @@ import leadRoutes from './routes/leadRoutes.js';
 import authRoutes from './routes/authRoute.js';
 import { errorHandler } from './middlewares/errorMiddleware.js';
 import notFound from './middlewares/notFoundMiddleware.js';
-
+import studentRoutes from "./routes/studentRoutes.js";//
 // Load env vars
 dotenv.config();
 
@@ -23,6 +23,7 @@ app.use('/api/leads', leadRoutes);
 app.use('/api/auth', authRoutes);
 app.use(notFound);
 app.use(errorHandler);
+app.use("/api/students", studentRoutes);//
 
 
 
