@@ -6,8 +6,11 @@ import {
     updateStudent,
     deleteStudent
 } from '../controllers/studentController.js';
+import { protect } from '../middlewares/authenticationMiddleware.js';
 
 const router = express.Router();
+
+router.use(protect);
 
 // Root path /api/students
 router.route('/')
