@@ -1,85 +1,89 @@
-import bcrypt from 'bcrypt';
 import User from '../models/Users.js';
 import generateToken from '../utils/generateToken.js';
+import asyncHandler from '../utils/asyncHandler.js';
+import ApiError from '../utils/ApiError.js';
 
-// 🔹 Response helper
-const sendUserResponse = (user) => ({
-    _id: user._id,
-    firstName: user.firstName,
-    lastName: user.lastName,
+const buildAuthResponse = (user) => ({
+  token: generateToken(user._id),
+  user: {
+    id: user._id,
+    name: user.name,
     email: user.email,
-    phone: user.phone,
-    token: generateToken(user._id),
-    role: user.role
+    role: user.role,
+    isActive: user.isActive,
+  },
 });
 
-// 🔹 REGISTER
-export const registerUser = async (req, res, next) => {
-    try {
-        const { firstName, lastName, email, password, phone } = req.body;
+export const registerUser = asyncHandler(async (req, res) => {
+  const { name, email, password, role } = req.body;
 
-        if (!firstName || !lastName || !email || !password || !phone) {
-            return res.status(400).json({ message: 'All fields are required' });
-        }
+  const existingUser = await User.findOne({ email: email.toLowerCase() });
+  if (existingUser) {
+    throw new ApiError(409, 'User already exists');
+  }
 
-        const existingUser = await User.findOne({ email: email.toLowerCase() });
-        if (existingUser) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
+  const user = await User.create({
+    name,
+    email: email.toLowerCase(),
+    password,
+    role: role || 'manager',
+  });
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+  res.status(201).json({
+    success: true,
+    message: 'User registered successfully',
+    data: buildAuthResponse(user),
+  });
+});
 
-        const user = await User.create({
-            firstName,
-            lastName,
-            email: email.toLowerCase(),
-            password: hashedPassword,
-            phone
-        });
+export const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-        res.status(201).json(sendUserResponse(user));
-    } catch (error) {
-        next(error);
-    }
-};
+  const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+  if (!user) {
+    throw new ApiError(401, 'Invalid credentials');
+  }
 
-// 🔹 LOGIN
-export const loginUser = async (req, res, next) => {
-    try {
-        const { email, password } = req.body;
+  if (!user.isActive) {
+    throw new ApiError(403, 'User account is inactive');
+  }
 
-        if (!email || !password) {
-            return res.status(400).json({ message: 'Email and password are required' });
-        }
+  const isMatch = await user.matchPassword(password);
+  if (!isMatch) {
+    throw new ApiError(401, 'Invalid credentials');
+  }
 
-        const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
-        if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
+  res.status(200).json({
+    success: true,
+    message: 'Login successful',
+    data: buildAuthResponse(user),
+  });
+});
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Invalid credentials' });
-        }
+export const me = asyncHandler(async (req, res) => {
+  res.status(200).json({
+    success: true,
+    data: {
+      id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      role: req.user.role,
+      isActive: req.user.isActive,
+    },
+  });
+});
 
-        user.lastLoginAt = Date.now();
-        await user.save({ validateBeforeSave: false });
+export const refreshToken = asyncHandler(async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) {
+    throw new ApiError(401, 'No token provided');
+  }
 
-        res.status(200).json(sendUserResponse(user));
-    } catch (error) {
-        next(error);
-    }
-};
-
-// 🔹 GET ME
-export const me = async (req, res, next) => {
-    try {
-        const user = await User.findById(req.user._id).select('-password');
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        res.status(200).json(user);
-    } catch (error) {
-        next(error);
-    }
-};
+  // MVP approach: if current token is valid, issue a new one.
+  const newToken = generateToken(req.user._id);
+  res.status(200).json({
+    success: true,
+    message: 'Token refreshed',
+    data: { token: newToken },
+  });
+});
