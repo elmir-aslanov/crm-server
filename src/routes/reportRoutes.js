@@ -1,7 +1,6 @@
 import express from 'express';
 import { getAttendanceReport, getGroupFillRateReport, getLeadSourceReport, getMonthlyRevenueReport } from '../controllers/reportController.js';
-import { protect, authorizeRoles } from '../middlewares/autenticationMiddleware.js';
-
+import { protect, authorizeRoles } from '../middlewares/authenticationMiddleware.js';
 const router = express.Router();
 
 router.get('/leads/source', protect, authorizeRoles('Admin', 'Manager'), getLeadSourceReport);

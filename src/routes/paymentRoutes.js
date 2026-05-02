@@ -1,6 +1,6 @@
 import express from 'express';
 import { createPayment, getOverduePayments, updatePaymentStatus } from '../controllers/paymentController.js';
-import { protect, authorizeRoles } from '../middlewares/autenticationMiddleware.js';
+import { protect, authorizeRoles } from '../middlewares/authenticationMiddleware.js';
 
 const router = express.Router();
 

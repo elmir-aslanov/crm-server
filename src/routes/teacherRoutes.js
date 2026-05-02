@@ -1,7 +1,6 @@
 import express from 'express';
 import { getTeacherGroups, getTeacherSchedule } from '../controllers/teacherController.js';
-import { protect, authorizeRoles } from '../middlewares/autenticationMiddleware.js';
-
+import { protect, authorizeRoles } from '../middlewares/authenticationMiddleware.js';
 const router = express.Router();
 
 router.get('/groups/me', protect, authorizeRoles('Teacher'), getTeacherGroups);

@@ -6,7 +6,7 @@ import {
     deleteStudent,
     getStudentProfile
 } from '../controllers/studentController.js';
-import { protect, authorizeRoles } from '../middlewares/autenticationMiddleware.js';
+import { protect, authorizeRoles } from '../middlewares/authenticationMiddleware.js';
 
 const router = express.Router();
 

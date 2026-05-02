@@ -1,12 +1,11 @@
 import express from 'express';
-import { 
-    getAllGroups, 
-    createGroup, 
-    addStudentToGroup, 
-    getGroupStudents 
+import {
+    getAllGroups,
+    createGroup,
+    addStudentToGroup,
+    getGroupStudents
 } from '../controllers/groupController.js';
-import { protect, authorizeRoles } from '../middlewares/autenticationMiddleware.js';
-
+import { protect, authorizeRoles } from '../middlewares/authenticationMiddleware.js';
 const router = express.Router();
 
 router.get('/', protect, getAllGroups);
