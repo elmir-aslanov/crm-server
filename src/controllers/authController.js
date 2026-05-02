@@ -2,17 +2,17 @@ import User from '../models/Users.js';
 import generateToken from '../utils/generateToken.js';
 import generateRefreshToken from '../utils/generateRefreshToken.js';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
-// 🔹 Response helper
 const sendUserResponse = (user) => ({
     _id: user._id,
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
     phone: user.phone,
+    role: user.role,
     accessToken: generateToken(user._id),
     refreshToken: generateRefreshToken(user._id),
-    role: user.role
 });
 
 const buildTokens = (user) => ({
@@ -20,47 +20,57 @@ const buildTokens = (user) => ({
     refreshToken: generateRefreshToken(user._id),
 });
 
-// 🔹 REGISTER
+// REGISTER
 export const registerUser = async (req, res, next) => {
     try {
-        const { firstName, lastName, email, password, phone } = req.body;
+        const { firstName, lastName, email, password, phone, role } = req.body;
 
         if (!firstName || !lastName || !email || !password || !phone) {
             return res.status(400).json({ message: 'All fields are required' });
         }
 
         const existingUser = await User.findOne({ email: email.toLowerCase() });
+
         if (existingUser) {
-            throw new ApiError(409, 'User already exists');
+            return res.status(409).json({ message: 'User already exists' });
         }
 
         const user = await User.create({
-            name,
+            firstName,
+            lastName,
             email: email.toLowerCase(),
             password,
+            phone,
             role: role || 'manager',
         });
 
         res.status(201).json({
             success: true,
             message: 'User registered successfully',
-            data: buildAuthResponse(user),
+            data: sendUserResponse(user),
         });
-    });
+    } catch (error) {
+        next(error);
+    }
+};
 
-    export const loginUser = asyncHandler(async (req, res) => {
+// LOGIN
+export const loginUser = async (req, res, next) => {
+    try {
         const { email, password } = req.body;
 
         const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+
         if (!user) {
-            throw new ApiError(401, 'Invalid credentials');
+            return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        if (!user.isActive) {
-            throw new ApiError(403, 'User account is inactive');
+        if (user.isActive === false) {
+            return res.status(403).json({ message: 'User account is inactive' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
+
         if (!isMatch) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
@@ -74,20 +84,23 @@ export const registerUser = async (req, res, next) => {
     }
 };
 
-// 🔹 GET ME
+// GET ME
 export const me = async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id).select('-password');
+
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+
         res.status(200).json(user);
     } catch (error) {
         next(error);
     }
 };
 
-export const refreshToken = async (req, res, next) => {
+// REFRESH TOKEN
+export const refreshToken = async (req, res) => {
     try {
         const { refreshToken } = req.body;
 
@@ -95,7 +108,11 @@ export const refreshToken = async (req, res, next) => {
             return res.status(400).json({ message: 'Refresh token is required' });
         }
 
-        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET);
+        const decoded = jwt.verify(
+            refreshToken,
+            process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET
+        );
+
         const user = await User.findById(decoded.id).select('-password');
 
         if (!user) {
@@ -104,7 +121,7 @@ export const refreshToken = async (req, res, next) => {
 
         res.status(200).json({
             user,
-            ...buildTokens(user)
+            ...buildTokens(user),
         });
     } catch (error) {
         res.status(401).json({ message: 'Invalid or expired refresh token' });

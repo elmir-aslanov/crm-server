@@ -1,17 +1,16 @@
 import express from 'express';
-import { 
-  createLead, 
-  getAllLeads, 
-  getLeadById, 
-  updateLead, 
+import {
+  createLead,
+  getAllLeads,
+  getLeadById,
+  updateLead,
   deleteLead,
   updateLeadStatus,
   addLeadNote,
   getLeadHistory,
   getAllLeadNotes
 } from '../controllers/leadController.js';
-import { protect, authorizeRoles } from '../middlewares/autenticationMiddleware.js';
-
+import { protect, authorizeRoles } from '../middlewares/authenticationMiddleware.js';
 const router = express.Router();
 
 router.post('/', protect, authorizeRoles('Admin', 'Manager'), createLead);
