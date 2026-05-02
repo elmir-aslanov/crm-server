@@ -1,6 +1,8 @@
 import bcrypt from 'bcrypt';
 import User from '../models/Users.js';
 import generateToken from '../utils/generateToken.js';
+import generateRefreshToken from '../utils/generateRefreshToken.js';
+import jwt from 'jsonwebtoken';
 
 // 🔹 Response helper
 const sendUserResponse = (user) => ({
@@ -9,8 +11,14 @@ const sendUserResponse = (user) => ({
     lastName: user.lastName,
     email: user.email,
     phone: user.phone,
-    token: generateToken(user._id),
+        accessToken: generateToken(user._id),
+        refreshToken: generateRefreshToken(user._id),
     role: user.role
+});
+
+const buildTokens = (user) => ({
+    accessToken: generateToken(user._id),
+    refreshToken: generateRefreshToken(user._id),
 });
 
 // 🔹 REGISTER
@@ -81,5 +89,29 @@ export const me = async (req, res, next) => {
         res.status(200).json(user);
     } catch (error) {
         next(error);
+    }
+};
+
+export const refreshToken = async (req, res, next) => {
+    try {
+        const { refreshToken } = req.body;
+
+        if (!refreshToken) {
+            return res.status(400).json({ message: 'Refresh token is required' });
+        }
+
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id).select('-password');
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid refresh token' });
+        }
+
+        res.status(200).json({
+            user,
+            ...buildTokens(user)
+        });
+    } catch (error) {
+        res.status(401).json({ message: 'Invalid or expired refresh token' });
     }
 };

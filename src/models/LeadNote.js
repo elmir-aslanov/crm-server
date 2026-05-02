@@ -10,7 +10,7 @@ const leadNoteSchema = new mongoose.Schema(
         note: {
             type: String,
             required: [true, 'Note is required'],
-            default: null,
+            trim: true,
         },
         createBy: {
             type: mongoose.Schema.ObjectId,
@@ -19,9 +19,7 @@ const leadNoteSchema = new mongoose.Schema(
         },
     },
     {
-        timestamp: true,
-    },
-    {
+        timestamps: true,
         versionKey: false,
      }
 );

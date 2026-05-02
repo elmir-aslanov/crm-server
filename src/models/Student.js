@@ -1,14 +1,29 @@
 import mongoose from 'mongoose';
 
 const studentSchema = new mongoose.Schema({
-    name: {
+    leadId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Lead',
+        default: null
+    },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
+    },
+    studentCode: {
         type: String,
-        required: [true, 'Name is required'],
+        required: true,
+        unique: true
+    },
+    firstName: {
+        type: String,
+        required: [true, 'First name is required'],
         trim: true
     },
-    surname: {
+    lastName: {
         type: String,
-        required: [true, 'Surname is required'],
+        required: [true, 'Last name is required'],
         trim: true
     },
     email: {
@@ -18,19 +33,23 @@ const studentSchema = new mongoose.Schema({
         lowercase: true,
         match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address']
     },
-    age: {
-        type: Number,
-        required: [true, 'Age is required'],
-        min: [16, 'Age must be at least 16']
-    },
-    course: {
+    phone: {
         type: String,
-        required: [true, 'Course name is required']
+        required: [true, 'Phone is required'],
+        trim: true
     },
-    createdAt: {
+    birthDate: {
         type: Date,
-        default: Date.now
+        default: null
+    },
+    status: {
+        type: String,
+        enum: ['Active', 'Suspended', 'Graduated', 'Dropped'],
+        default: 'Active'
     }
+}, {
+    timestamps: true,
+    versionKey: false
 });
 
 const Student = mongoose.model('Student', studentSchema);
