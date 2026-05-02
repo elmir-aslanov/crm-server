@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt';
 import User from '../models/Users.js';
 import generateToken from '../utils/generateToken.js';
 import generateRefreshToken from '../utils/generateRefreshToken.js';
@@ -11,8 +10,8 @@ const sendUserResponse = (user) => ({
     lastName: user.lastName,
     email: user.email,
     phone: user.phone,
-        accessToken: generateToken(user._id),
-        refreshToken: generateRefreshToken(user._id),
+    accessToken: generateToken(user._id),
+    refreshToken: generateRefreshToken(user._id),
     role: user.role
 });
 
@@ -32,37 +31,33 @@ export const registerUser = async (req, res, next) => {
 
         const existingUser = await User.findOne({ email: email.toLowerCase() });
         if (existingUser) {
-            return res.status(400).json({ message: 'User already exists' });
+            throw new ApiError(409, 'User already exists');
         }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await User.create({
-            firstName,
-            lastName,
+            name,
             email: email.toLowerCase(),
-            password: hashedPassword,
-            phone
+            password,
+            role: role || 'manager',
         });
 
-        res.status(201).json(sendUserResponse(user));
-    } catch (error) {
-        next(error);
-    }
-};
+        res.status(201).json({
+            success: true,
+            message: 'User registered successfully',
+            data: buildAuthResponse(user),
+        });
+    });
 
-// 🔹 LOGIN
-export const loginUser = async (req, res, next) => {
-    try {
+    export const loginUser = asyncHandler(async (req, res) => {
         const { email, password } = req.body;
-
-        if (!email || !password) {
-            return res.status(400).json({ message: 'Email and password are required' });
-        }
 
         const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
         if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            throw new ApiError(401, 'Invalid credentials');
+        }
+
+        if (!user.isActive) {
+            throw new ApiError(403, 'User account is inactive');
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
