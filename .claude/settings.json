@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(head -60)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\YOGA\\Desktop\\crm-frontend\\frontend\\src\\pages"
+    ]
+  }
+}

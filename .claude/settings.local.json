@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "PowerShell(cd \"C:\\\\Users\\\\YOGA\\\\Desktop\\\\crm-frontend\"; Get-ChildItem -Path . -Recurse | Select-Object -Property FullName | ForEach-Object { $_.FullName } | Sort-Object)",
+      "Read(//c/Users/YOGA/Desktop/crm-frontend/**)"
+    ]
+  }
+}

@@ -5,10 +5,10 @@ import User from '../models/Users.js';
 dotenv.config();
 
 const seedUsers = [
-  { name: 'System Admin', email: 'admin@academy.az', password: 'Admin123!', role: 'admin' },
-  { name: 'Sales Manager', email: 'manager@academy.az', password: 'Manager123!', role: 'manager' },
-  { name: 'Regular User 1', email: 'user1@academy.az', password: 'User12345!', role: 'user' },
-  { name: 'Regular User 2', email: 'user2@academy.az', password: 'User12345!', role: 'user' },
+  { firstName: 'System', lastName: 'Admin', email: 'admin@academy.az', password: 'Admin123!', role: 'Admin' },
+  { firstName: 'Sales', lastName: 'Manager', email: 'manager@academy.az', password: 'Manager123!', role: 'Manager' },
+  { firstName: 'Regular', lastName: 'User 1', email: 'user1@academy.az', password: 'User12345!', role: 'Student' },
+  { firstName: 'Regular', lastName: 'User 2', email: 'user2@academy.az', password: 'User12345!', role: 'Student' },
 ];
 
 const runSeed = async () => {
