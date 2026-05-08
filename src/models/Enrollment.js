@@ -33,6 +33,8 @@ const enrollmentSchema = new mongoose.Schema({
     versionKey: false
 });
 
+enrollmentSchema.index({ studentId: 1, groupId: 1 }, { unique: true });
+
 const Enrollment = mongoose.model('Enrollment', enrollmentSchema);
 
 export default Enrollment;

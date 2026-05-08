@@ -36,7 +36,7 @@ const leadSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['New', 'Contacted', 'Interested', 'Trial', 'Enrolled', 'Lost'],
+      enum: ['New', 'Contacted', 'Proposal Sent', 'Won', 'Lost'],
       default: 'New',
     },
     assignedTo: {
@@ -56,6 +56,9 @@ const leadSchema = new mongoose.Schema(
     versionKey: false,
   }
 );
+
+leadSchema.index({ status: 1, assignedTo: 1 });
+leadSchema.index({ createdAt: -1 });
 
 const Lead = mongoose.model('Lead', leadSchema);
 

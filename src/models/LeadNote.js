@@ -12,8 +12,8 @@ const leadNoteSchema = new mongoose.Schema(
             required: [true, 'Note is required'],
             trim: true,
         },
-        createBy: {
-            type: mongoose.Schema.ObjectId,
+        createdBy: {
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             default: null,
         },

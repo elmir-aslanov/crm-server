@@ -9,12 +9,12 @@ const leadStatusHistorySchema = new mongoose.Schema(
         },
         oldStatus: {
             type: String,
-            enum: ['New', 'Contacted', 'Interested', 'Trial', 'Enrolled', 'Lost'],
+            enum: ['New', 'Contacted', 'Proposal Sent', 'Won', 'Lost'],
             required: true,
         },
         newStatus: {
             type: String,
-            enum: ['New', 'Contacted', 'Interested', 'Trial', 'Enrolled', 'Lost'],
+            enum: ['New', 'Contacted', 'Proposal Sent', 'Won', 'Lost'],
             required: true,
         },
         changedBy: {
