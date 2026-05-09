@@ -5,7 +5,15 @@
       "PowerShell(cd \"C:\\\\Users\\\\YOGA\\\\Desktop\\\\crm-frontend\"; Get-ChildItem -Path . -Recurse | Select-Object -Property FullName | ForEach-Object { $_.FullName } | Sort-Object)",
       "Read(//c/Users/YOGA/Desktop/crm-frontend/**)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "Bash(dir \"C:\\\\Users\\\\elmireas\\\\Desktop\" /b)"
+      "Bash(dir \"C:\\\\Users\\\\elmireas\\\\Desktop\" /b)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\YOGA\\\\Desktop\\\\crm-server\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(mkdir -p \"C:\\\\Users\\\\YOGA\\\\Desktop\\\\crm-frontend\\\\frontend\\\\src\\\\registry\\\\magicui\")",
+      "Bash(npx tsc *)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\YOGA\\Desktop\\crm-frontend\\frontend\\src\\registry"
     ]
   }
 }

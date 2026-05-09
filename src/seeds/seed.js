@@ -14,14 +14,25 @@ const seedUsers = [
 const runSeed = async () => {
   try {
     await connectDB();
+    console.log('✓ MongoDB connected');
 
     await User.deleteMany({});
-    await User.create(seedUsers);
+    console.log('✓ Existing users cleared');
 
-    console.log('Seed completed successfully');
+    for (const userData of seedUsers) {
+      const user = new User(userData);
+      await user.save(); // triggers pre-save bcrypt hook
+      console.log(`✓ User created: ${user.email} (${user.role})`);
+    }
+
+    console.log('✓ Seed completed successfully');
+    console.log('');
+    console.log('Login credentials:');
+    console.log('  Admin   → admin@academy.az   / Admin123!');
+    console.log('  Manager → manager@academy.az / Manager123!');
     process.exit(0);
   } catch (error) {
-    console.error(`Seed failed: ${error.message}`);
+    console.error(`✗ Seed failed: ${error.message}`);
     process.exit(1);
   }
 };

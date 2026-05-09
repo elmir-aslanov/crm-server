@@ -54,8 +54,7 @@ export const loginUser = asyncHandler(async (req, res) => {
         throw new ApiError(403, 'Account is deactivated');
     }
 
-    user.lastLoginAt = new Date();
-    await user.save();
+    await User.updateOne({ _id: user._id }, { lastLoginAt: new Date() });
 
     res.status(200).json({
         success: true,
